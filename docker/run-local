@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+version=DEV-SNAPSHOT
+registry=local
+stackName=idporten-bankidmobil
+localConfig=$1
+
+mvn package -DskipTests || exit 1
+docker/build-images ${registry} ${version}  ${localConfig} || exit 1
+rm -rf docker/idporten-bankidmobil/puppet_hiera/*  docker/idporten-bankidmobil/puppet_modules/* docker/idporten-bankidmobil/war/*|| exit 1
+
+echo "LOG_ENV=$(whoami)" > docker/log_config
+VERSION=${version} REGISTRY=${registry} docker stack deploy -c docker/stack.yml --resolve-image=never ${stackName} || exit 1
+rm docker/log_config
+docker service update --publish-add 443:443 ${stackName}_web
+docker stack deploy -c docker/stack-local.yml ${stackName} || exit 1
+docker service inspect ${stackName}_desktop --format \
+    'Miljøet kan nås på vnc://localhost:{{(index .Endpoint.Ports 0).PublishedPort}} eller http://localhost:{{(index .Endpoint.Ports 1).PublishedPort}} (passord: vncpassword)'

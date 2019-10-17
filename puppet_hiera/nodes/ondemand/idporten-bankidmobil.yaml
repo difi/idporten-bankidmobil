@@ -1,0 +1,22 @@
+---
+classes:
+- idporten_bankidmobil
+- filebeat
+
+idporten_bankidmobil::site_host:             'eid-atest-web01.dmz.local'
+idporten_bankidmobil::server_host:           'idporten-openam'
+idporten_bankidmobil::server_port:           '8080'
+
+# ********************************************************************************
+# * Configuration for filebeat
+# ********************************************************************************
+filebeat::prospectors:
+  tomcat-access:
+    paths:
+    - '/var/log/idporten-bankidmobil/access_log'
+    doc_type: 'tomcat-access'
+    fields_under_root: true
+    fields:
+      application: idporten-bankidmobil
+      environment: atest
+      log_env : "${LOG_ENV:unset}"

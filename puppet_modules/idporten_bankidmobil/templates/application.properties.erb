@@ -1,0 +1,33 @@
+<% if !(@fqdn.scan(/\d{2}/).empty?)
+@serverid = @fqdn.scan(/\d{2}/).last
+else
+@serverid = ''
+end
+-%>
+bankid.servlet.address=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/bankid<% if !(@serverid.empty?) %>/<%= @serverid %>/<% end %>
+bankid.response.servlet.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/bidresponse
+bankid.response.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/authorizationCode
+bankid.event.emitter=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/eventEmitter
+bankid.serverid=<% if !(@serverid.empty?) %>/<%= @serverid %>/<% end %>
+bankid.action=<%= @bankid_action %>
+bankid.clienttype=<%= @bankid_clienttype %>
+bankid.keystorefile=<%= @bankid_keystore_file %>
+bankid.keystorefile.password=<%= @bankid_keystore_password %>
+bankid.merchant.name=<%= @bankid_merchant_name %>
+bankid.webaddress.hostname=<%= @bankid_webaddress_hostname %>
+bankid.webaddress.ip=<%= @bankid_webaddress_ip %>
+bankid.grantedpolicies=<%= @bankid_grantedpolicies %>
+bankid.timeout=
+bankid.reset=
+bankid.logging.enabled=<%= @bankid_logging_enabled %>
+bankid.logging.propfile=<%= @bankid_logging_prop_file %>
+bankid.logging.categoryname=<%= @bankid_logging_category_name %>
+bankid.cors.allow_origin=<%= @bankid_cors_allow_origin %>
+bankid.suppress_broadcast=<%= @bankid_suppress_broadcast %>
+
+idporten.redirecturl=https://<%= @bankid_webaddress_hostname %>/UI/Login?realm=norge.no
+
+management.endpoints.web.cors.allowed-origins=http://localhost:8080
+management.endpoints.web.cors.allowed-methods=GET,POST,HEAD
+management.health.diskspace.enabled=false
+
