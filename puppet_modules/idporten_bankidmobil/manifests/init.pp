@@ -32,8 +32,8 @@ class idporten_bankidmobil (
 
   anchor { 'idporten_bankidmobil::begin': } ->
   class { '::idporten_bankidmobil::install': } ->
-  class { '::idporten_bankidmobil::config': } ~>
   class { '::idporten_bankidmobil::deploy': } ->
+  class { '::idporten_bankidmobil::config': } ~>
   class { '::idporten_bankidmobil::test_setup': } ->
   class { '::idporten_bankidmobil::service': } ->
   anchor { 'idporten_bankidmobil::end': }
