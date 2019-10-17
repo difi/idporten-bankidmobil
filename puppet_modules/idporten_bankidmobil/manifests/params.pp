@@ -22,10 +22,11 @@ class idporten_bankidmobil::params {
   $idporten_install_dir                          = '/opt/idporten-bankidmobil'
   $config_root                                   = '/etc/opt/'
   $log_root                                      = '/var/log/'
-  $install_dir                      = '/opt/'
+  $install_dir                                   = '/opt/'
   $module                                        = 'idporten_bankidmobil'
   $application                                   = 'idporten-bankidmobil'
   $context                                       = 'opensso'
   $setup_openam                                  = false
   $idporten_redirect_url                         = 'http://localhost:8080/redirecturl'
+  $java_home                                     = hiera('platform::java_home')
 }
