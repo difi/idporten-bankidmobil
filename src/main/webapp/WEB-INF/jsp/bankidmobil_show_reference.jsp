@@ -11,10 +11,13 @@
     <script src="/idporten-bankid-mobil/js/server_sent_event.js"></script>
     <script type="text/javascript">
         $(document).ready(function () {
-            if (!!window.EventSource) {
+            var eventSourceValue = <%= request.getSession().getAttribute("eventsourceEnabled") %>;
+            if (!!window.EventSource && eventSourceValue) {
                 var sessionId = "<%=request.getSession().getId()%>";
+                console.log("Bruker emitter " + sessionId);
                 setUpEmitter(sessionId);
             } else {
+                console.log("Bruker polling");
                 ventPaaMobil();
             }
         });

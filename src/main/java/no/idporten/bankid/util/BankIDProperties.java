@@ -78,6 +78,9 @@ public class BankIDProperties {
         @Value("${bankid.suppress_broadcast}")
         private String bankIdSuppressBroadcast;
 
+        @Value("${eventsource.enabled}")
+        private boolean eventsourceEnabled;
+
         //bankid.cors.allow_origin=https://csfe-preprod.bankid.no
 
         private Boolean shouldResetBankId;

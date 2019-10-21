@@ -1,5 +1,6 @@
 package no.idporten.bankid;
 
+import lombok.extern.slf4j.Slf4j;
 import no.bbs.server.vos.BIDSessionData;
 import org.ehcache.Cache;
 import org.ehcache.CacheManager;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 
+@Slf4j
 @Component
 public class BankIDCache {
 
@@ -96,6 +98,7 @@ public class BankIDCache {
     }
 
     void removeEmitter(String sid) {
+        log.debug("Remove emitter " + sid);
         Cache<String, SseEmitter> emitterCache = cacheManager.getCache("emitter", String.class, SseEmitter.class);
         emitterCache.remove(sid);
     }

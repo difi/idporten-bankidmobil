@@ -56,6 +56,9 @@ public class BankIDMobilAuthorizeController {
     @Value("${idporten.redirecturl}")
     private String redirectUrl;
 
+    @Value("${eventsource.enabled: true}")
+    private boolean eventSourceEnabled;
+
 
     @GetMapping
     public ModelAndView doGet(HttpServletRequest request) {
@@ -67,6 +70,7 @@ public class BankIDMobilAuthorizeController {
         request.getSession().setAttribute("goto", request.getParameter("goto"));
         request.getSession().setAttribute("service", request.getParameter("goto"));
         request.getSession().setAttribute("start-service", request.getParameter("start-service"));
+        request.getSession().setAttribute("eventsourceEnabled", eventSourceEnabled);
         setSessionState(request, STATE_USERDATA);
         initMobileInfo(request);
 
@@ -203,8 +207,10 @@ public class BankIDMobilAuthorizeController {
             throw new BankIDMobileCancelException();
         }
         if (BankIDMobileStatus.FINISHED.equals(bankIDCache.getMobileStatus(request.getSession().getId()))) {
+            log.debug("STATE_AUTHENTICATED " + request.getSession().getId());
             return STATE_AUTHENTICATED;
         } else {
+            log.debug("Error - STATE_AUTHENTICATED " + request.getSession().getId());
             return prepareErrorPage(null, request);
         }
     }

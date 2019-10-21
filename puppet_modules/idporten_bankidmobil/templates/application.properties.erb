@@ -31,6 +31,7 @@ management.endpoints.web.cors.allowed-origins=http://localhost:8080
 management.endpoints.web.cors.allowed-methods=GET,POST,HEAD
 management.health.diskspace.enabled=false
 
-local.spring.security.user.name=<%= @bankid_mobil_basic_username %>
-local.spring.security.user.password=<%= @bankid_mobil_basic_password %>
+spring.security.user.name=<%= @bankidmobil_basic_username %>
+spring.security.user.password=<%= @bankidmobil_basic_password %>
 
+eventsource.enabled=<%= @eventsource_enabled %>
