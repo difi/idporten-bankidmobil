@@ -6,7 +6,6 @@ class idporten_bankidmobil::params {
   $bankid_webaddress_hostname                    = hiera('platform::external_host')
   $bankid_webaddress_ip                          = hiera('common::internet_ip')
   $node_environment                              = hiera('platform::node_environment', '')
-  $bankid_enabled                                = true
   $bankid_action                                 = 'auth'
   $bankid_clienttype                             = 'NC'
   $bankid_keystore_file                          = '/etc/opt/idporten-bankidmobil/ID-Porten-BINAS.bid'
@@ -19,6 +18,9 @@ class idporten_bankidmobil::params {
   $bankid_ocsp_max_time_skew                     = 240000
   $bankid_cors_allow_origin                      = 'https://csfe-preprod.bankid.no'
   $bankid_suppress_broadcast                     = 'N'
+  $bankidmobil_basic_username                    = 'user'
+  $bankidmobil_basic_password                    = 'password'
+  $mvc_async_request_timeout                     = 180000
   $idporten_install_dir                          = '/opt/idporten-bankidmobil'
   $config_root                                   = '/etc/opt/'
   $log_root                                      = '/var/log/'

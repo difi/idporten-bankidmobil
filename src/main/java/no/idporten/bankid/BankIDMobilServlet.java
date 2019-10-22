@@ -106,6 +106,7 @@ public class BankIDMobilServlet {
         try {
             bankIDFacadeWrapper.getFacade().verifyTransactionRequest(operation, encKey, encData, encAuth, sid,
                     sessionData);
+            log.debug("verifyTransactionRequest ok " + sessionData.getCertificateStatus().getAddInfoSSN());
             bankIDCache.putOCSP(sid, sessionData.getCertificateStatus().getOcspResponse());
             bankIDCache.putSSN(sid, sessionData.getCertificateStatus().getAddInfoSSN());
             bankIDCache.putMobileStatus(sid, BankIDMobileStatus.FINISHED);
