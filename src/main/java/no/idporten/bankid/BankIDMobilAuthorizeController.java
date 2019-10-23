@@ -85,6 +85,10 @@ public class BankIDMobilAuthorizeController {
                 log.error("Request har ikke session? ");
                 return new ModelAndView("bankidmobil_error");
             }
+            if (request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE) == null) {
+                log.error("Request httpSessionState ");
+                return new ModelAndView("bankidmobil_error");
+            }
             int state = (int) request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE);
             if (state == STATE_USERDATA) {
                 return getNextView(request, handleUserdataInput(request));
