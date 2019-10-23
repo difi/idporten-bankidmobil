@@ -6,6 +6,7 @@ import no.bbs.server.vos.BIDSessionData;
 import no.idporten.bankid.util.BankIDProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -139,7 +140,8 @@ public class BankIDMobilServlet {
         }
     }
 
-    @GetMapping("/mobilstatusEmitter/{sid}")
+    @GetMapping(value = "/mobilstatusEmitter/{sid}",
+            produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamSseMvc(@PathVariable String sid) {
         log.error("kaller mobilstatusEmitter " + sid);
         SseEmitter emitter = bankIDCache.getEmitter(sid);
