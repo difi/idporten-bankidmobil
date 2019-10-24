@@ -1,6 +1,7 @@
 #init.pp
 class idporten_bankidmobil (
   $bankid_webaddress_hostname                    =$idporten_bankidmobil::params::bankid_webaddress_hostname,
+  $bankid_servlet_hostname                       =$idporten_bankidmobil::params::bankid_servlet_hostname,
   $bankid_webaddress_ip                          =$idporten_bankidmobil::params::bankid_webaddress_ip,
   $node_environment                              =$idporten_bankidmobil::params::node_environment,
   $bankid_action                                 =$idporten_bankidmobil::params::bankid_action,

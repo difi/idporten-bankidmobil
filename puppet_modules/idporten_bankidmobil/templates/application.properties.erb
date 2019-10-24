@@ -4,7 +4,7 @@ else
 @serverid = ''
 end
 -%>
-bankid.servlet.address=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/bankid<% if !(@serverid.empty?) %>/<%= @serverid %>/<% end %>
+bankid.servlet.address=https://<%= @bankid_servlet_hostname %>/idporten-bankid-mobil/bankid<% if !(@serverid.empty?) %>/<%= @serverid %>/<% end %>
 bankid.response.servlet.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/bidresponse
 bankid.response.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/authorizationCode
 bankid.event.emitter=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/eventEmitter
@@ -14,7 +14,7 @@ bankid.clienttype=<%= @bankid_clienttype %>
 bankid.keystorefile=<%= @bankid_keystore_file %>
 bankid.keystorefile.password=<%= @bankid_keystore_password %>
 bankid.merchant.name=<%= @bankid_merchant_name %>
-bankid.webaddress.hostname=<%= @bankid_webaddress_hostname %>
+bankid.webaddress.hostname=<%= @bankid_servlet_hostname %>
 bankid.webaddress.ip=<%= @bankid_webaddress_ip %>
 bankid.grantedpolicies=<%= @bankid_grantedpolicies %>
 bankid.timeout=

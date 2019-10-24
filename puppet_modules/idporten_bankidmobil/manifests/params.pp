@@ -3,6 +3,7 @@ class idporten_bankidmobil::params {
   $artifact_id                                   = 'idporten-bankidmobil'
   $service_name                                  = 'idporten-bankidmobil'
   $server_port                                   = 10004
+  $bankid_servlet_hostname                       = hiera('platform::external_host')
   $bankid_webaddress_hostname                    = hiera('platform::external_host')
   $bankid_webaddress_ip                          = hiera('common::internet_ip')
   $node_environment                              = hiera('platform::node_environment', '')
