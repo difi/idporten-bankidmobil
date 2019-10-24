@@ -21,6 +21,7 @@ class idporten_bankidmobil (
   $mvc_async_request_timeout                     =$idporten_bankidmobil::params::mvc_async_request_timeout,
   $config_root                                   =$idporten_bankidmobil::params::config_root,
   $log_root                                      =$idporten_bankidmobil::params::log_root,
+  $log_level                                     =$idporten_bankidmobil::params::log_level,
   $module                                        =$idporten_bankidmobil::params::module,
   $application                                   =$idporten_bankidmobil::params::application,
   $context                                       =$idporten_bankidmobil::params::context,

@@ -25,6 +25,7 @@ class idporten_bankidmobil::params {
   $idporten_install_dir                          = '/opt/idporten-bankidmobil'
   $config_root                                   = '/etc/opt/'
   $log_root                                      = '/var/log/'
+  $log_level                                     = 'WARN'
   $install_dir                                   = '/opt/'
   $module                                        = 'idporten_bankidmobil'
   $application                                   = 'idporten-bankidmobil'
