@@ -59,9 +59,13 @@ public class BankIDMobilAuthorizeController {
     @Value("${eventsource.enabled: true}")
     private boolean eventSourceEnabled;
 
+    @Value("${spring.mvc.async.request-timeout}")
+    private Long mvcAsyncRequestTimeout;
+
 
     @GetMapping
     public ModelAndView doGet(HttpServletRequest request) {
+        log.debug("mvcAsyncRequestTimeout: " + mvcAsyncRequestTimeout);
         request.getSession().setAttribute(BankIDProperties.HTTP_SESSION_AUTH_TYPE, AuthType.BANKID_MOBILE);
         request.getSession().setAttribute("redirectUrl", request.getParameter("redirectUrl"));
         request.getSession().setAttribute("ForceAuth", request.getParameter("ForceAuth"));
@@ -214,13 +218,20 @@ public class BankIDMobilAuthorizeController {
         if (isButtonPushed(request, IDPortenButtonType.CANCEL)) {
             throw new BankIDMobileCancelException();
         }
-        if (BankIDMobileStatus.FINISHED.equals(bankIDCache.getMobileStatus(request.getSession().getId()))) {
-            log.debug("STATE_AUTHENTICATED " + request.getSession().getId());
+        String sessionId = request.getSession().getId();
+        BankIDMobileStatus mobileStatus = bankIDCache.getMobileStatus(sessionId);
+        if (BankIDMobileStatus.FINISHED == mobileStatus) {
+            log.debug("STATE_AUTHENTICATED " + sessionId);
             return STATE_AUTHENTICATED;
-        } else {
-            log.debug("Error - STATE_AUTHENTICATED " + request.getSession().getId());
+        } else if (mobileStatus == null || mobileStatus == BankIDMobileStatus.ERROR) {
+            log.debug("Error - STATE_AUTHENTICATED " + sessionId);
             return prepareErrorPage(null, request);
+        } else if (BankIDMobileStatus.WAIT == mobileStatus) {
+            log.debug("Still waiting: " + sessionId);
+            return STATE_USERDATA;
         }
+        log.debug("Shouldn't come here " + mobileStatus);
+        return prepareErrorPage(null, request);
     }
 
     protected int prepareErrorPage(String errorCode, HttpServletRequest request) {
