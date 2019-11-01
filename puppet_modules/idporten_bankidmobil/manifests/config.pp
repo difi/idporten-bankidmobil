@@ -24,8 +24,8 @@ class idporten_bankidmobil::config inherits idporten_bankidmobil {
     group             => $idporten_bankidmobil::service_name,
     resilience        => false,
     performance_class => '',
-    loglevel_no       => $idporten_bankidmobil::idporten_log_level,
-    loglevel_nondifi  => $idporten_bankidmobil::idporten_log_level,
+    loglevel_no       => $idporten_bankidmobil::log_level,
+    loglevel_nondifi  => $idporten_bankidmobil::log_level,
   } ->
   file { "${idporten_bankidmobil::config_root}${idporten_bankidmobil::application}/messages/idporten_en.properties":
     ensure => 'file',

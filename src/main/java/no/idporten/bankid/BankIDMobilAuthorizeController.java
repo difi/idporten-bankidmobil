@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.UUID;
 
 /**
  * Logic implementation of BankID web client (BankID 2.0)  module.
@@ -65,18 +66,20 @@ public class BankIDMobilAuthorizeController {
 
     @GetMapping
     public ModelAndView doGet(HttpServletRequest request) {
-        log.debug("mvcAsyncRequestTimeout: " + mvcAsyncRequestTimeout);
+        request.getSession().invalidate();
+        String sid = UUID.randomUUID().toString();
         request.getSession().setAttribute(BankIDProperties.HTTP_SESSION_AUTH_TYPE, AuthType.BANKID_MOBILE);
+        request.getSession().setAttribute("sid", sid);
         request.getSession().setAttribute("redirectUrl", request.getParameter("redirectUrl"));
         request.getSession().setAttribute("ForceAuth", request.getParameter("ForceAuth"));
         request.getSession().setAttribute("gx_charset", request.getParameter("gx_charset"));
         request.getSession().setAttribute("locale", request.getParameter("locale"));
         request.getSession().setAttribute("goto", request.getParameter("goto"));
-        request.getSession().setAttribute("service", request.getParameter("goto"));
+        request.getSession().setAttribute("service", request.getParameter("service"));
         request.getSession().setAttribute("start-service", request.getParameter("start-service"));
         request.getSession().setAttribute("eventsourceEnabled", eventSourceEnabled);
         setSessionState(request, STATE_USERDATA);
-        initMobileInfo(request);
+        initMobileInfo(sid);
 
         return new ModelAndView("bankidmobil_enter_userdata");
     }
@@ -85,19 +88,11 @@ public class BankIDMobilAuthorizeController {
     public ModelAndView doPost(HttpServletRequest request,
                                HttpServletResponse response) throws URISyntaxException, IOException {
         try {
-            if (request.getSession() == null) {
-                log.error("Request har ikke session? ");
-                return new ModelAndView("bankidmobil_enter_userdata");
-            }
-            if (request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE) == null) {
-                log.error("Request httpSessionState er tom");
-                return new ModelAndView("bankidmobil_enter_userdata");
-            }
             int state = (int) request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE);
             if (state == STATE_USERDATA) {
-                return getNextView(request, handleUserdataInput(request));
+                return getNextView(request, response, handleUserdataInput(request));
             } else if (state == STATE_VERIFICATION_CODE) {
-                return getNextView(request, handlePollingFinished(request));
+                return getNextView(request, response, handlePollingFinished(request));
             } else if (state == STATE_ERROR) {
                 handleErrorPage();
                 return new ModelAndView("bankidmobil_error");
@@ -117,7 +112,7 @@ public class BankIDMobilAuthorizeController {
         return startService == null ? "null" : startService.toString();
     }
 
-    private ModelAndView getNextView(HttpServletRequest request, int state) {
+    private ModelAndView getNextView(HttpServletRequest request, HttpServletResponse response, int state) throws IOException {
         setSessionState(request, state);
         if (state == STATE_VERIFICATION_CODE) {
             return new ModelAndView("bankidmobil_show_reference");
@@ -126,25 +121,29 @@ public class BankIDMobilAuthorizeController {
         } else if (state == STATE_ERROR) {
             return new ModelAndView("bankidmobil_error");
         } else if (state == STATE_AUTHENTICATED) {
-            return new ModelAndView(redirectUrl);
+            log.error("Should rather get to ResponseServlet " + request.getSession().getId());
+            log.debug("RedirectUrl: " + request.getSession().getAttribute("redirectUrl"));
+            response.sendRedirect((String) request.getSession().getAttribute("redirectUrl"));
         } else {
             return new ModelAndView("bankidmobil_error");
         }
+        log.debug("Shouldn't get here");
+        return new ModelAndView("bankidmobil_error");
     }
 
     /**
      * Inits mobileInfo object with values that are the same for all authentications with BankID mobile or
      * can be gotten from config/session.
-     * @param request
+     * @param sid unique identifier for session
      */
-    protected void initMobileInfo(HttpServletRequest request) {
+    private void initMobileInfo(String sid) {
         final MobileInfo mobileInfo = new MobileInfo();
         mobileInfo.setCountryCode("47");
         mobileInfo.setDoSynchronusCommunication(false);
         mobileInfo.setDoAliasCheck(true);
         mobileInfo.setLocale("no_NO");
         mobileInfo.setAction("auth");
-        mobileInfo.setSid(request.getSession().getId());
+        mobileInfo.setSid(sid);
         mobileInfo.setUrl(bankIdProperties.getBankIdServletAddress());
         this.mobileInfo = mobileInfo;
     }
@@ -157,7 +156,7 @@ public class BankIDMobilAuthorizeController {
      * @return
      * @throws LoginException
      */
-    protected int handleUserdataInput(HttpServletRequest request) throws LoginException {
+    private int handleUserdataInput(HttpServletRequest request) throws LoginException {
         if (isButtonPushed(request, IDPortenButtonType.CANCEL)) {
             throw new BankIDMobileCancelException();
         }
@@ -186,16 +185,19 @@ public class BankIDMobilAuthorizeController {
      * @return
      * @throws LoginException
      */
-    protected int prepareMobileTransaction(HttpServletRequest request) throws LoginException {
+    private int prepareMobileTransaction(HttpServletRequest request) {
         try {
             final String merchantReference = bankIdFacadeWrapper.getFacade().generateMerchantReference("no_NO");
+            log.debug("merchant reference: " + merchantReference);
             getMobileInfo().setMerchantReference(merchantReference);
             final TransactionAndStatus mobileSession = bankIdFacadeWrapper.getFacade().requestMobileAction(getMobileInfo());
+            log.debug("Request mobile session: " + merchantReference);
             mobileSession.setStatusCode("0");
             mobileSession.setTransactionReference(merchantReference);
             if ("0".equalsIgnoreCase(mobileSession.getStatusCode())) {
                 bankIDCache.putMobileStatus(request.getSession().getId(), BankIDMobileStatus.WAIT);
                 request.setAttribute("code", merchantReference);
+                log.debug("mobileInfo: " + getMobileInfoAsString(getMobileInfo()));
                 return STATE_VERIFICATION_CODE;
             } else {
                 log.error("Failed to generate merchant reference and request mobile action " + toStringMobileSession(mobileSession));
@@ -205,6 +207,15 @@ public class BankIDMobilAuthorizeController {
             log.error("Failed to generate merchant reference and request mobile action", e);
             return prepareErrorPage(null, request);
         }
+    }
+
+    private String getMobileInfoAsString(MobileInfo mobileInfo) {
+        return mobileInfo.getSid() +
+                "-" + mobileInfo.getMerchantReference() +
+                "-" + mobileInfo.getMifv() +
+                "-" + mobileInfo.getMitm() +
+                "-" + mobileInfo.getPopInfo() +
+                "-" + mobileInfo.getPopParameters();
     }
 
     /**
@@ -224,17 +235,17 @@ public class BankIDMobilAuthorizeController {
             log.debug("STATE_AUTHENTICATED " + sessionId);
             return STATE_AUTHENTICATED;
         } else if (mobileStatus == null || mobileStatus == BankIDMobileStatus.ERROR) {
-            log.debug("Error - STATE_AUTHENTICATED " + sessionId);
+            log.debug("Error in mobilestatus " + sessionId + " - " + mobileStatus);
             return prepareErrorPage(null, request);
         } else if (BankIDMobileStatus.WAIT == mobileStatus) {
             log.debug("Still waiting: " + sessionId);
-            return STATE_USERDATA;
+            return STATE_VERIFICATION_CODE;
         }
         log.debug("Shouldn't come here " + mobileStatus);
         return prepareErrorPage(null, request);
     }
 
-    protected int prepareErrorPage(String errorCode, HttpServletRequest request) {
+    private int prepareErrorPage(String errorCode, HttpServletRequest request) {
         if (StringUtils.isNotEmpty(errorCode)) {
             request.setAttribute("errorCode", errorCode);
         }
@@ -243,10 +254,9 @@ public class BankIDMobilAuthorizeController {
 
     /**
      * Handles actions from error page.  The only action is to cancel the authentication and return to eid selector.
-     * @return never returns
      * @throws LoginException always returns {@link BankIDMobileCancelException}
      */
-    protected int handleErrorPage() throws LoginException {
+    private void handleErrorPage() throws LoginException {
         throw new BankIDMobileCancelException("User wants to restart authentication");
     }
 
@@ -257,7 +267,7 @@ public class BankIDMobilAuthorizeController {
         return "MobileSession: StatusCode[" + mobileSession.getStatusCode() + "], TransactionReference[" + mobileSession.getTransactionReference()+"]";
     }
 
-    protected String validateMobileNumber(final HttpServletRequest request) {
+    private String validateMobileNumber(final HttpServletRequest request) {
         final String messageId = "no.idporten.module.bankid.input.mobile.error";
         final IDPortenInputType inputType = IDPortenInputType.CONTACTINFO_MOBILE;
         final IDPortenFeedbackType feedbackType = IDPortenFeedbackType.WARNING;
@@ -274,7 +284,7 @@ public class BankIDMobilAuthorizeController {
         return input;
     }
 
-    protected String validateDate(final HttpServletRequest request) {
+    private String validateDate(final HttpServletRequest request) {
         final String messageId = "no.idporten.module.bankid.input.birthdate.error";
         final IDPortenInputType inputType = IDPortenInputType.BIRTHDATE;
         String input = getInput(request, inputType);

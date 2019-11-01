@@ -29,10 +29,6 @@ public class CacheConfiguration {
                         CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, BIDSessionData.class,
                                 ResourcePoolsBuilder.heap(100))
                                 .build())
-                .withCache("uuidSid",
-                        CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, String.class,
-                                ResourcePoolsBuilder.heap(100))
-                                .build())
                 .withCache("ocsp",
                         CacheConfigurationBuilder.newCacheConfigurationBuilder(String.class, byte[].class,
                                 ResourcePoolsBuilder.heap(100))

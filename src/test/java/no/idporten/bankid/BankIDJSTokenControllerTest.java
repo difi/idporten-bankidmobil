@@ -43,21 +43,29 @@ public class BankIDJSTokenControllerTest {
 
     @Test
     public void handleAuthorizationCodeGrant() throws Exception {
-        String code = "fc897796-58da-4f68-91fb-f62b972fe323";
-        String sid = "ASDF24513";
+        String sid = "fc897796-58da-4f68-91fb-f62b972fe323";
         String ssn = "23079422487";
         byte[] ocsp = "ocsp osv greier skikkelig lang".getBytes();
-        bankIDCache.putSID(code, sid);
         bankIDCache.putSSN(sid, ssn);
         bankIDCache.putOCSP(sid, ocsp);
         mockMvc.perform(post("/token")
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .param("code", code))
+                .param("code", sid))
                 .andExpect(status().is2xxSuccessful())
                 .andExpect(jsonPath("$.ssn").value(containsString(ssn)))
                 .andExpect(jsonPath("$.ocsp").value(containsString(Base64.encodeBase64String(ocsp))));
         assertNull(bankIDCache.getSSN(sid));
-        assertNull(bankIDCache.getSID(code));
+
+    }
+
+    @Test
+    public void handleAuthorizationCodeNotFound() throws Exception {
+        String sid = "fc897796-58da-4f68-91fb-f62b972fe323";
+        mockMvc.perform(post("/token")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+                .param("code", sid))
+                .andExpect(status().isNotFound());
+        assertNull(bankIDCache.getSSN(sid));
 
     }
 

@@ -13,10 +13,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.UUID;
 
 
 @Controller
@@ -26,6 +26,12 @@ public class BankIDMobilResponseServlet extends HttpServlet {
    private static final long serialVersionUID = 3734847325014355167L;
 
     private static final String SERVICE_PARAMETER_NAME = "service";
+    private static final String GOTO_PARAMETER_NAME = "goto";
+    private static final String FORCE_AUTH_PARAMETER_NAME = "ForceAuth";
+    private static final String CHARSET_PARAMETER_NAME = "gx_charset";
+    private static final String LOCALE_PARAMETER_NAME = "locale";
+    private static final String SERVER_ID_PARAMETER_NAME = "serverId";
+    private static final String SID_PARAMETER_NAME = "code";
     private static final String BANKID_RESPONSE_SERVICE = "BankIDMobilEkstern";
 
     private BankIDProperties bankIDProperties;
@@ -38,38 +44,29 @@ public class BankIDMobilResponseServlet extends HttpServlet {
         this.bankIDCache = bankIDCache;
     }
 
-    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/bidresponse")
+    @RequestMapping(method = {RequestMethod.POST}, value = "/bidresponse")
     protected void service(HttpServletRequest request,
                            @RequestParam(required = false) String idpError,
                            HttpServletResponse response) throws IOException {
-        try {
-            String sid = request.getSession().getId();
-            String uuid = createUUID(sid);
-            UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
-                    .uri(new URI(bankIDProperties.getBankIdResponseUrl()))
-                    .queryParam("code", uuid)
-                    .queryParam("serverid", bankIDProperties.getBankIdServerId());
-            //TODO: Finn this.url og legg på responseURL
-            if (idpError == null) {
-                if (SsnValidator.isValid(bankIDCache.getSSN(sid))) {
-                    builder.queryParam(SERVICE_PARAMETER_NAME, BANKID_RESPONSE_SERVICE);
-                } else {
-                    builder.queryParam(SERVICE_PARAMETER_NAME, getStartServiceForError(request));
-                    request.getSession().setAttribute(SERVICE_PARAMETER_NAME, getStartServiceForError(request));
-                }
+        String sid = (String) request.getSession().getAttribute("sid");
+        log.debug("/bidresponse status: " + request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE)
+                + " idperror " + idpError + " status: " + bankIDCache.getMobileStatus(sid));
+        String code = (BankIDMobileStatus.FINISHED == bankIDCache.getMobileStatus(sid)) ? sid : "";
+        String service;
+        if (idpError == null) {
+            if (SsnValidator.isValid(bankIDCache.getSSN(sid))) {
+                service = BANKID_RESPONSE_SERVICE;
             } else {
-                builder.queryParam(SERVICE_PARAMETER_NAME, getStartServiceForError(request));
-                request.getSession().setAttribute(SERVICE_PARAMETER_NAME, getStartServiceForError(request));
-                log.error("BankIDResponseServlet User restarting due to error: " + idpError);
+                service = getStartServiceForError(request);
             }
-
-            log.debug("code: " + uuid);
-
-            response.sendRedirect(builder.build().toUriString());
-
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        } else {
+            service = getStartServiceForError(request);
+            log.error("BankIDResponseServlet User restarting due to error: " + idpError);
         }
+
+        String url = buildUrl(code, service, request);
+        renderHelpingPage(response, url);
+
     }
 
     private String getStartServiceForError(HttpServletRequest request) {
@@ -77,9 +74,51 @@ public class BankIDMobilResponseServlet extends HttpServlet {
         return startService == null ? "null" : startService.toString();
     }
 
-    private String createUUID(String sid) {
-        String uuid = UUID.randomUUID().toString();
-        bankIDCache.putSID(uuid, sid);
-        return uuid;
+    private String buildUrl(String code, String service, HttpServletRequest request) {
+        HttpSession session = request.getSession();
+        try {
+            return UriComponentsBuilder.newInstance()
+                       .uri(new URI((String) session.getAttribute("redirectUrl")))
+                       .queryParam(SID_PARAMETER_NAME, code)
+                       .queryParam(FORCE_AUTH_PARAMETER_NAME, session.getAttribute("forceAuth"))
+                       .queryParam(CHARSET_PARAMETER_NAME, request.getSession().getAttribute("gx_charset"))
+                       .queryParam(LOCALE_PARAMETER_NAME, request.getSession().getAttribute("locale"))
+                       .queryParam(GOTO_PARAMETER_NAME, request.getSession().getAttribute("goto"))
+                       .queryParam(SERVICE_PARAMETER_NAME, service)
+                       .queryParam(SERVER_ID_PARAMETER_NAME, request.getSession().getAttribute("serverId"))
+                       .build()
+                       .toUriString();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
+
+
+    private void renderHelpingPage(HttpServletResponse response, String url) throws IOException {
+        StringBuilder result = new StringBuilder();
+        result.append(top(url));
+        result.append(footer());
+        response.setContentType(getContentType());
+        response.getWriter().append(result);
+    }
+
+    private String top(String url) {
+        return "<html>" +
+                "<head><title>Submit This Form</title></head>" +
+                "<body onload=\"javascript:document.forms[0].submit()\">" +
+                "<form target=\"_parent\" method=\"post\" action=\"" + url + "\">";
+    }
+
+    private String footer() {
+        return "<noscript><input type=\"submit\" value=\"Click to redirect\"></noscript>" +
+                "</form>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private String getContentType() {
+        return "text/html";
+    }
+
 }

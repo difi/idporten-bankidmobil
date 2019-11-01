@@ -41,22 +41,6 @@ public class BankIDCache {
         sidSSNCache.put(sid, ssn);
     }
 
-    String getSID(String uuid) {
-        Cache<String, String> uuidSidCache = cacheManager.getCache("uuidSid", String.class, String.class);
-        return uuidSidCache.get(uuid);
-    }
-
-    void removeUuidSID(String uuid) {
-        Cache<String, String> uuidSidCache = cacheManager.getCache("uuidSid", String.class, String.class);
-        uuidSidCache.remove(uuid);
-    }
-
-    void putSID(String uuid, String sid) {
-        Cache<String, String> uuidSidCache = cacheManager.getCache("uuidSid", String.class, String.class);
-        uuidSidCache.put(uuid, sid);
-    }
-
-
     BIDSessionData getBIDSessionData(String sid) {
         Cache<String, BIDSessionData> bidSessionCache = cacheManager.getCache("bidSession", String.class, BIDSessionData.class);
         return bidSessionCache.get(sid);

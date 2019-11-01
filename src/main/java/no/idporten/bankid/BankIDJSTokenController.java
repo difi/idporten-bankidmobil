@@ -25,37 +25,20 @@ public class BankIDJSTokenController {
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     @ResponseBody
     public ResponseEntity handleAuthorizationCodeGrant(TokenRequest tokenRequest) {
-        String code = tokenRequest.getCode();
-        String sid = bankIDCache.getSID(code);
-        if (sid == null) {
-            return ResponseEntity.notFound().build();
-        }
+        String sid = tokenRequest.getCode();
+
         String ssn = bankIDCache.getSSN(sid);
         byte[] ocsp = bankIDCache.getOCSP(sid);
+
+        if (ssn == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         final TokenResponse tokenResponse = new TokenResponse(ssn,
                 Base64.encodeBase64String(ocsp), expirySeconds);
 
         bankIDCache.removeSession(sid);
-        bankIDCache.removeUuidSID(code);
         return ResponseEntity.ok(tokenResponse);
     }
-
-    @PostMapping(
-            value = "/test",
-            produces = MediaType.APPLICATION_JSON_VALUE,
-            consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    @ResponseBody
-    public ResponseEntity testAuthorizationCodeGrant(TokenRequest tokenRequest) {
-        String code = tokenRequest.getCode();
-
-
-        final TokenResponse tokenResponse = new TokenResponse("324243",
-                Base64.encodeBase64String("ocsp".getBytes()), expirySeconds);
-
-        return ResponseEntity.ok(tokenResponse);
-    }
-
-
 
 }

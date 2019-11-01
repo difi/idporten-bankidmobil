@@ -76,7 +76,7 @@ public class BankIDFacadeWrapper {
         }
         
             
-        // This is used in the MITM configuration:
+        // This is used in the MITM configuration. If we need multiple webadresses, they need to be comma-separated:
         log.debug("The server hostname is: " + bankIDProperties.getBankIdServerPublicHostname()
                 + " and the Public ip is: " + bankIDProperties.getBankIdPublicIP());
         merchantConfig.setWebAddresses(bankIDProperties.getBankIdServerPublicHostname() + ","

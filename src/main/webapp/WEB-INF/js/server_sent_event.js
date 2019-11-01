@@ -4,6 +4,19 @@ function setUpEmitter(sessionId) {
         $('#complete').submit();
     });
     source.onerror = function(e) {
-        $('#complete').submit();
+        sjekkLagretStatus();
     };
+}
+
+function sjekkLagretStatus() {
+    var url = '/idporten-bankid-mobil/edge';
+    $.get(url, function(status) {
+        //Fortsetter å vente
+        if (status == 'WAIT') {
+        }  else {
+            $('#complete').submit();
+        }
+    }).fail(function(jqxhr, textStatus, error) {
+        $('#complete').submit();
+    });
 }

@@ -77,7 +77,6 @@ public class BankIDMobilServletTest {
 
     @Test
     public void testServiceServletRequestServletResponseInitAuthRequest() throws IOException {
-
         String encKey = "A+Me5563j3NjM3CnxT1UwAYX3TwOoyziXmLzrKauG4yhFMIVDhXVkzsrwtj2NYQNFDKzWvrUJSOcDUmk/tCHJetE+xwuX6z/blL8Gb7hBatzULjXdmJ2+ApjQ3K8rRMrgTWhPNwvx/kRII4Ju06AdRcxbsXrJDypOJFrqHEMddQdtCkXQPM7HibAMHBa+Zbu+cuEbXqqxue6OPjuzZEds/o85xi0LY0Dg0Jrb0Ed9fVNO6Gaf0hLxtLS/LSj2PuAjrvtiOMmvifyR/grn4OWZeAmM1mdrJSkcCiQnz4PaDeInEiTf7K6nfKZJwm1llrYVtCR/OXEAZk85zs5ld3n5w==";
         String encAuth = "40bnSzKDoU59Mb1S/ti6ZkChIp8=";
         String encData = "DiRa10wwrYvW2pkIk7ht0qy8VdAtvUiuo23jVpkoRNo1RyLPreHEXghDYwghRpW4nbR0sFaodt0ds0vjsPiF/5dQqvJhcseiYi1SIHBdLBtPyZj94jUMQxKp5yDOCuD56QV+sorJed89hv8Cg3Ipz/8fP0FVHttJ34mdd+Lz5ZcDk/fNcmT8MnYRjVY6MKS2TiNIKhAyfuV1kO2rgzioUQ==";

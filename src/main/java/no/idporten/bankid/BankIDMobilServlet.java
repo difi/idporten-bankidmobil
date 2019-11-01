@@ -43,15 +43,11 @@ public class BankIDMobilServlet {
                            @RequestParam String encAuth,
                            HttpServletResponse response) throws IOException {
         response.setContentType("text/plain");
-        log.info(request.getParameter("ForceAuth"));
         if ("initAuth".equalsIgnoreCase(operation)) {
-//             log.debug("initAuth Response: " + initAuth(request));
             response.getWriter().println(initAuth(operation, sid, encKey, encData, encAuth));
         } else if ("verifyAuth".equalsIgnoreCase(operation)) {
-//             log.debug("verifyAuth Response: " + verifyAuth(request));
             response.getWriter().println(verifyAuth(operation, sid, encKey, encData, encAuth));
         } else if ("handleError".equalsIgnoreCase(operation)) {
-//             log.debug("handleError Response: " + handleError(request));
             response.getWriter().println(handleError(operation, sid, encKey, encData, encAuth));
         } else {
             log.warn("Unexpected operation: " + operation);
@@ -143,7 +139,7 @@ public class BankIDMobilServlet {
     @GetMapping(value = "/mobilstatusEmitter/{sid}",
             produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamSseMvc(@PathVariable String sid) {
-        log.error("kaller mobilstatusEmitter " + sid);
+        log.debug("kaller mobilstatusEmitter " + sid);
         SseEmitter emitter = bankIDCache.getEmitter(sid);
         if (emitter == null) {
             log.warn("lager ny emitter");

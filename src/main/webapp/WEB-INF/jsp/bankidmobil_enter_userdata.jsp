@@ -2,16 +2,14 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 <jsp:include page="header.jsp" />
 
-<main>
+<main id="bankidmobil-main">
     <section class="Box">
 
-        <div class="Box_main">
+        <div class="Box_main" id="bankidwrapper">
             <div class="fm-Progress_Container">
                 <div class="fm-Progress_Dot active"></div>
                 <div class="fm-Progress_Dot"></div>
             </div>
-
-
                 <form action="#" class="login" method="post">
                     <fieldset>
                         <div class="fm-Fields">

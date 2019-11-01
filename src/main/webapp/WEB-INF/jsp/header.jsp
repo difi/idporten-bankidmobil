@@ -12,5 +12,16 @@
     <meta charset="utf-8">
 
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <script src="/idporten-bankid-mobil/js/jquery-3.2.1.min.js"></script>
+    <script src="/idporten-bankid-mobil/js/post_message_from_iframe.js"></script>
+    <script type="text/javascript">
+        window.onload = function() {
+            sendPostMessage();
+        };
+        window.onresize = function() {
+            sendPostMessage();
+        };
+    </script>
 </head>
 <body id="body" class="<%=request.getAttribute("class")%>" >

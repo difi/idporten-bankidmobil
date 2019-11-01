@@ -13,36 +13,36 @@
         $(document).ready(function () {
             var eventSourceValue = <%= request.getSession().getAttribute("eventsourceEnabled") %>;
             if (!!window.EventSource && eventSourceValue) {
-                var sessionId = "<%=request.getSession().getId()%>";
-                console.log("Bruker emitter " + sessionId);
+                var sessionId = "<%=request.getSession().getAttribute("sid")%>";
                 setUpEmitter(sessionId);
             } else {
-                console.log("Bruker polling");
                 ventPaaMobil();
             }
         });
     </script>
 </head>
-<main>
-    <section class="Box">
-        <div class="fm-Progress_Container">
-            <div class="fm-Progress_Dot"></div>
-            <div class="fm-Progress_Dot active"></div>
-        </div>
+<main id="bankidmobil-main">
+    <section class="Box" >
+        <div id="bankidwrapper">
+            <div class="fm-Progress_Container">
+                <div class="fm-Progress_Dot"></div>
+                <div class="fm-Progress_Dot active"></div>
+            </div>
 
-        <form id="complete" method="post">
-            <fieldset>
-                <div class="notification with-Icon with-Link icon-sms">
-                    <spring:message code="no.idporten.module.bankid.showcode.code" text="referanseord"/>
-                    <strong class=""><%= request.getAttribute("code") %></strong>
-                    <br/><spring:message code="no.idporten.module.bankid.showcode.info" text="Følg instruksene på mobilen din"/>
-                </div>
-                <div class="fm-Controls with-Normal">
-                    <button name="idporten.inputbutton.CANCEL" id="cancelButton" tabindex="10" class="btn btn-Normal">
-                        <span><spring:message code="auth.ui.button.cancel" text="Avbryt"/></span>
-                    </button>
-                </div>
-            </fieldset>
-        </form>
+            <form id="complete" method="post" action="bidresponse">
+                <fieldset>
+                    <div class="notification with-Icon with-Link icon-sms">
+                        <spring:message code="no.idporten.module.bankid.showcode.code" text="referanseord"/>
+                        <strong class=""><%= request.getAttribute("code") %></strong>
+                        <br/><spring:message code="no.idporten.module.bankid.showcode.info" text="Følg instruksene på mobilen din"/>
+                    </div>
+                    <div class="fm-Controls with-Normal">
+                        <button name="idporten.inputbutton.CANCEL" id="cancelButton" tabindex="10" class="btn btn-Normal">
+                            <span><spring:message code="auth.ui.button.cancel" text="Avbryt"/></span>
+                        </button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
     </section>
 </main>
