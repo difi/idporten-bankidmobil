@@ -7,7 +7,7 @@
     <link rel="stylesheet" type="text/css" href="css/font-awesome.css">
     <link rel="stylesheet" type="text/css" href="css/open-sans.css">
     <link rel="stylesheet" type="text/css" href="css/style.min.css">
-    <link rel="stylesheet" type="text/css" href="css/idporten-difi.css">
+    <link rel="stylesheet" type="text/css" href="css/idporten-difi-bankidmobil.css">
 
     <meta charset="utf-8">
 
