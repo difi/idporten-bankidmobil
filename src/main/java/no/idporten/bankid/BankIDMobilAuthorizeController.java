@@ -20,6 +20,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -29,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -51,6 +53,7 @@ public class BankIDMobilAuthorizeController {
 
     private final BankIDProperties bankIdProperties;
     private final BankIDFacadeWrapper bankIdFacadeWrapper;
+    private final LocaleResolver localeResolver;
 
     private final BankIDCache bankIDCache;
 
@@ -64,8 +67,9 @@ public class BankIDMobilAuthorizeController {
     private Long mvcAsyncRequestTimeout;
 
 
+
     @GetMapping
-    public ModelAndView doGet(HttpServletRequest request) {
+    public ModelAndView doGet(HttpServletRequest request, HttpServletResponse response) {
         request.getSession().invalidate();
         String sid = UUID.randomUUID().toString();
         request.getSession().setAttribute(BankIDProperties.HTTP_SESSION_AUTH_TYPE, AuthType.BANKID_MOBILE);
@@ -78,6 +82,7 @@ public class BankIDMobilAuthorizeController {
         request.getSession().setAttribute("service", request.getParameter("service"));
         request.getSession().setAttribute("start-service", request.getParameter("start-service"));
         request.getSession().setAttribute("eventsourceEnabled", eventSourceEnabled);
+        localeResolver.setLocale(request, response, new Locale(request.getParameter("locale")));
         setSessionState(request, STATE_USERDATA);
         initMobileInfo(sid);
 
