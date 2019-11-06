@@ -23,7 +23,7 @@
             <form action="#" class="login" method="post">
                     <fieldset>
                         <div class="fm-Fields">
-                            <c:set var ="errorMobile" scope = "session" value='<%= request.getSession().getAttribute("idporten.feedback.CONTACTINFO_MOBILE") %>'/>
+                            <c:set var ="errorMobile" scope = "session" value='<%= request.getSession().getAttribute("idporten.input.CONTACTINFO_MOBILE") %>'/>
                             <div class="fm-Field ${errorMobile != null ? ' error' : ''}">
                                 <label for="idporten.input.CONTACTINFO_MOBILE"><spring:message code="no.idporten.module.bankid.input.mobile" text="Mobilnummer"/></label>
                                 <input  autofocus=""
@@ -36,7 +36,7 @@
                                         autocomplete="off" />
                             </div>
 
-                            <c:set var ="errorBirthDate" scope = "session" value='<%= request.getSession().getAttribute("idporten.feedback.BIRTHDATE") %>'/>
+                            <c:set var ="errorBirthDate" scope = "session" value='<%= request.getSession().getAttribute("idporten.input.BIRTHDATE") %>'/>
                             <div class="fm-Field ${errorBirthDate != null ? ' error' : ''}">
                                 <label for="idporten.input.BIRTHDATE"><spring:message code="no.idporten.module.bankid.input.birthdate" text="Fødselsdato"/></label>
                                 <input  tabindex="2"

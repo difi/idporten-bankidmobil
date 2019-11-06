@@ -1,10 +1,8 @@
 package no.idporten.bankid;
 
 import no.idporten.bankid.config.CacheConfiguration;
-import no.idporten.bankid.util.BankIDProperties;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
@@ -16,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -46,9 +43,6 @@ public class BankIDMobilResponseServletTest {
     private HttpSession mockedSession;
 
     @Autowired
-    BankIDProperties bankIDProperties;
-
-    @Autowired
     BankIDCache bankIDCache;
 
 
@@ -65,7 +59,7 @@ public class BankIDMobilResponseServletTest {
         when(mockedSession.getAttribute("service")).thenReturn("BIDEksternResponse");
 
         when(mockedResponse.getWriter()).thenReturn(mockedWriter);
-        rs = new BankIDMobilResponseServlet(bankIDProperties, bankIDCache);
+        rs = new BankIDMobilResponseServlet(bankIDCache);
 
     }
 

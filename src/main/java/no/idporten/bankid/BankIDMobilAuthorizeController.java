@@ -48,6 +48,11 @@ public class BankIDMobilAuthorizeController {
     protected static final int STATE_ERROR = 3;
 
     private static final String SERVICE_PARAMETER_NAME = "service";
+    private final String IDPORTEN_INPUT_PREFIX = "idporten.input.";
+    private final String IDPORTEN_FEEDBACK_PREFIX = "idporten.feedback.";
+    private final String MOBILE_NUMBER = "mobileNumber";
+    private final String BIRTHDATE = "birthDate";
+    private final String IDPORTEN_INPUTBUTTON_PREFIX = "idporten.inputbutton.";
 
     private MobileInfo mobileInfo;
 
@@ -65,7 +70,6 @@ public class BankIDMobilAuthorizeController {
 
     @Value("${spring.mvc.async.request-timeout}")
     private Long mvcAsyncRequestTimeout;
-
 
 
     @GetMapping
@@ -104,7 +108,7 @@ public class BankIDMobilAuthorizeController {
             }
         } catch (LoginException e) {
             UriComponentsBuilder builder = UriComponentsBuilder.newInstance()
-                    .uri(new URI(bankIdProperties.getBankIdResponseUrl()))
+                    .uri(new URI(bankIdProperties.getBankIdResponseServletUrl()))
                     .queryParam("code", "")
                     .queryParam(SERVICE_PARAMETER_NAME, getStartServiceForError(request));
             response.sendRedirect(builder.build().toString());
@@ -171,8 +175,8 @@ public class BankIDMobilAuthorizeController {
             if (inputMobileNumber == null && inputBirthDate == null) {
                 setFeedback(request, IDPortenFeedbackType.WARNING, "no.idporten.module.bankid.input.birthdate_mobile.error");
             }
-            request.setAttribute("mobileNumber", inputMobileNumber != null ? ESAPI.encoder().encodeForHTMLAttribute(inputMobileNumber) : "");
-            request.setAttribute("birthDate", inputBirthDate != null ? ESAPI.encoder().encodeForHTMLAttribute(inputBirthDate) : "");
+            request.setAttribute(MOBILE_NUMBER, inputMobileNumber != null ? ESAPI.encoder().encodeForHTMLAttribute(inputMobileNumber) : "");
+            request.setAttribute(BIRTHDATE, inputBirthDate != null ? ESAPI.encoder().encodeForHTMLAttribute(inputBirthDate) : "");
             request.setAttribute("eventEmitterUrl", bankIdProperties.getBankIdEventEmitter());
             return STATE_USERDATA;
         }
@@ -286,7 +290,7 @@ public class BankIDMobilAuthorizeController {
             feedbackInvalidInput(request, feedbackType, inputType, messageId);
             return null;
         }
-        setFeedback(request, inputType, null);
+        clearInput(request, inputType);
         return input;
     }
 
@@ -303,25 +307,33 @@ public class BankIDMobilAuthorizeController {
             feedbackInvalidInput(request, IDPortenFeedbackType.WARNING, inputType, messageId);
             return null;
         }
-        setFeedback(request, inputType, null);
+        clearInput(request, inputType);
         return input;
     }
 
     private void feedbackInvalidInput(HttpServletRequest request, IDPortenFeedbackType feedbackType, IDPortenInputType inputType, String messageId) {
-        setFeedback(request, inputType, messageId);
+        setInput(request, inputType, messageId);
         setFeedback(request, feedbackType, messageId);
     }
 
     private void setFeedback(HttpServletRequest request, Enum feedbackType, String messageId) {
-        request.getSession().setAttribute("idporten.feedback." + feedbackType.toString(), messageId);
+        request.getSession().setAttribute(IDPORTEN_FEEDBACK_PREFIX + feedbackType.toString(), messageId);
+    }
+
+    private void setInput(HttpServletRequest request, Enum inputType, String messageId) {
+        request.getSession().setAttribute(IDPORTEN_INPUT_PREFIX + inputType.toString(), messageId);
+    }
+
+    private void clearInput(HttpServletRequest request, Enum feedbackType) {
+        request.getSession().setAttribute(IDPORTEN_INPUT_PREFIX + feedbackType.toString(), null);
     }
 
     private String getInput(HttpServletRequest request, IDPortenInputType inputType) {
-        return request.getParameter("idporten.input." + inputType.toString());
+        return request.getParameter(IDPORTEN_INPUT_PREFIX + inputType.toString());
     }
 
     private boolean isButtonPushed(HttpServletRequest request, IDPortenButtonType buttonType) {
-        return request.getParameter("idporten.inputbutton." + buttonType.toString()) != null;
+        return request.getParameter(IDPORTEN_INPUTBUTTON_PREFIX + buttonType.toString()) != null;
     }
 
     private void setSessionState(HttpServletRequest request, int state) {

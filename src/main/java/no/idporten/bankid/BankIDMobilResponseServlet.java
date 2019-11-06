@@ -34,17 +34,15 @@ public class BankIDMobilResponseServlet extends HttpServlet {
     private static final String SID_PARAMETER_NAME = "code";
     private static final String BANKID_RESPONSE_SERVICE = "BankIDMobilEkstern";
 
-    private BankIDProperties bankIDProperties;
     private BankIDCache bankIDCache;
 
     private final Logger log = LoggerFactory.getLogger(BankIDMobilResponseServlet.class);
 
-    BankIDMobilResponseServlet(BankIDProperties bankIDProperties, BankIDCache bankIDCache) {
-        this.bankIDProperties = bankIDProperties;
+    BankIDMobilResponseServlet(BankIDCache bankIDCache) {
         this.bankIDCache = bankIDCache;
     }
 
-    @RequestMapping(method = {RequestMethod.POST}, value = "/bidresponse")
+    @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/bidresponse")
     protected void service(HttpServletRequest request,
                            @RequestParam(required = false) String idpError,
                            HttpServletResponse response) throws IOException {
