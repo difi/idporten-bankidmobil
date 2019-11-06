@@ -286,6 +286,7 @@ public class BankIDMobilAuthorizeController {
             feedbackInvalidInput(request, feedbackType, inputType, messageId);
             return null;
         }
+        setFeedback(request, inputType, null);
         return input;
     }
 
@@ -302,6 +303,7 @@ public class BankIDMobilAuthorizeController {
             feedbackInvalidInput(request, IDPortenFeedbackType.WARNING, inputType, messageId);
             return null;
         }
+        setFeedback(request, inputType, null);
         return input;
     }
 
