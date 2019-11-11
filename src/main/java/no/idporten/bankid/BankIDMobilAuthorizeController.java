@@ -200,8 +200,7 @@ public class BankIDMobilAuthorizeController {
             log.debug("merchant reference: " + merchantReference);
             getMobileInfo().setMerchantReference(merchantReference);
             final TransactionAndStatus mobileSession = bankIdFacadeWrapper.getFacade().requestMobileAction(getMobileInfo());
-            log.debug("Request mobile session: " + merchantReference);
-            mobileSession.setStatusCode("0");
+            log.debug("Request mobile session: " + merchantReference + " statuskode: " + mobileSession.getStatusCode());
             mobileSession.setTransactionReference(merchantReference);
             if ("0".equalsIgnoreCase(mobileSession.getStatusCode())) {
                 bankIDCache.putMobileStatus(request.getSession().getId(), BankIDMobileStatus.WAIT);
