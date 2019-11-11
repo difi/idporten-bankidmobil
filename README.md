@@ -1,2 +1,2 @@
 # idporten-bankidmobil
-Integrasjon med/visning av BankId på mobil i ID-porten.
+Integrasjon med og visning av BankId på mobil i ID-porten.
