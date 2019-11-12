@@ -16,7 +16,7 @@
             <form method="post">
                 <fieldset>
                     <div class="fm-Controls with-Action">
-                        <button name="idporten.inputbutton.CLOSE" id="closeButton" tabindex="10" class="btn btn-Normal">
+                        <button name="idporten.inputbutton.CLOSE" id="closeButton" tabindex="10" class="btn btn-Action">
                             <span><spring:message code="auth.ui.button.retry" text="Prøv på nytt"/></span>
                         </button>
                     </div>
