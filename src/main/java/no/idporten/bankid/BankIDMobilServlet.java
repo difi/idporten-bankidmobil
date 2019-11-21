@@ -64,7 +64,7 @@ public class BankIDMobilServlet {
      */
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/edge")
     public void handleEdgePolling(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        final String sid = request.getSession().getId();
+        final String sid = (String) request.getSession().getAttribute("sid");
         BankIDMobileStatus mobileStatus = bankIDCache.getMobileStatus(sid);
         if (mobileStatus == null) {
             mobileStatus = BankIDMobileStatus.ERROR;
@@ -103,7 +103,7 @@ public class BankIDMobilServlet {
         try {
             bankIDFacadeWrapper.getFacade().verifyTransactionRequest(operation, encKey, encData, encAuth, sid,
                     sessionData);
-            log.debug("verifyTransactionRequest ok " + sessionData.getCertificateStatus().getAddInfoSSN());
+            log.debug("verifyTransactionRequest ok " + sessionData.getCertificateStatus().getAddInfoSSN() + " sid: " + sid);
             bankIDCache.putOCSP(sid, sessionData.getCertificateStatus().getOcspResponse());
             bankIDCache.putSSN(sid, sessionData.getCertificateStatus().getAddInfoSSN());
             bankIDCache.putMobileStatus(sid, BankIDMobileStatus.FINISHED);

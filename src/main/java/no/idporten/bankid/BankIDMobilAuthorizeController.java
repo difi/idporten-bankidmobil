@@ -203,7 +203,7 @@ public class BankIDMobilAuthorizeController {
             log.debug("Request mobile session: " + merchantReference + " statuskode: " + mobileSession.getStatusCode());
             mobileSession.setTransactionReference(merchantReference);
             if ("0".equalsIgnoreCase(mobileSession.getStatusCode())) {
-                bankIDCache.putMobileStatus(request.getSession().getId(), BankIDMobileStatus.WAIT);
+                bankIDCache.putMobileStatus((String) request.getSession().getAttribute("sid"), BankIDMobileStatus.WAIT);
                 request.setAttribute("code", merchantReference);
                 log.debug("mobileInfo: " + getMobileInfoAsString(getMobileInfo()));
                 return STATE_VERIFICATION_CODE;
