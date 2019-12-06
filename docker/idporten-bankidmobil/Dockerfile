@@ -15,29 +15,21 @@ COPY /puppet_hiera/ /puppet/hiera/
 RUN /puppet/puppet-apply
 
 
-FROM openjdk:8-jdk-slim
-ENV TZ=Europe/Oslo
-RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone  # Setter timezone, utan dette kan nokre testar feile
-RUN apt-get update; apt-get install curl -y --allow-unauthenticated  # laster ned curl for å laste filebeat og køyre helsesjekk
-#installere filebeat
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-5.6.13-amd64.deb
-RUN dpkg -i filebeat-5.6.13-amd64.deb  #installerer filebeat
-RUN rm filebeat-5.6.13-amd64.deb
+FROM eid-jenkins02.dmz.local:8081/spring-boot-base:latest
+
 
 ARG APPLICATION=idporten-bankidmobil
 ARG ARTIFACT_ID=idporten-bankidmobil
 
 COPY --from=config /etc/filebeat/ /etc/filebeat/
 COPY --from=config /etc/opt/${APPLICATION}/ /etc/opt/${APPLICATION}/
-
-RUN mkdir /usr/local/webapps/
 COPY /war/${ARTIFACT_ID}.war /usr/local/webapps/application.war
 COPY --from=config /opt/${APPLICATION}/${ARTIFACT_ID}.conf /usr/local/webapps/application.conf
 
-
 COPY entrypoint.sh /entrypoint.sh
+
 HEALTHCHECK --interval=10s --start-period=10s --retries=15 \
-   CMD { curl -f --max-time 10 http://localhost:8080/actuator/health; } || exit 1
+   CMD { curl -f --max-time 10 http://localhost:8080/health; } || exit 1
 
 ENTRYPOINT ["sh", "/entrypoint.sh"]
 

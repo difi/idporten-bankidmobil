@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.1.9.RELEASE</version>
+        <version>2.2.1.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.idporten</groupId>
@@ -23,14 +23,8 @@
         <bbs.bankid.version>5.3.3</bbs.bankid.version>
         <idporten.lib.common.pojo.version>2019-06-27-1343-fe81e6d</idporten.lib.common.pojo.version>
         <commons.lang.version>2.6</commons.lang.version>
-        <forgerock.commons.guava.version>18.0.4</forgerock.commons.guava.version>
-        <google.guava.version>21.0</google.guava.version>
-        <forgerock.util.version>20.3.3.1</forgerock.util.version>
-        <joda.time.version>2.10.3</joda.time.version>
-        <problem.version>0.23.0</problem.version>
-        <javax.cache.version>1.1.1</javax.cache.version>
-        <ehcache.version>3.8.0</ehcache.version>
         <logstash.logback.version>5.2</logstash.logback.version>
+        <bouncycastle.version>1.60</bouncycastle.version>
     </properties>
 
     <dependencies>
@@ -78,12 +72,10 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.10.0.pr3</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-core</artifactId>
-            <version>2.10.0.pr3</version>
         </dependency>
 
         <dependency>
@@ -97,7 +89,6 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
-            <version>9.0.24</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -105,16 +96,14 @@
             <version>1.2</version>
         </dependency>
         <dependency>
-            <groupId>javax.cache</groupId>
-            <artifactId>cache-api</artifactId>
-            <version>${javax.cache.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.ehcache</groupId>
             <artifactId>ehcache</artifactId>
-            <version>${ehcache.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>org.owasp.esapi</groupId>
+            <artifactId>esapi</artifactId>
+            <version>2.2.0.0</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
@@ -125,32 +114,22 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/log4j/log4j -->
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-        </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcmail-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.60</version>
+            <version>${bouncycastle.version}</version>
         </dependency>
-        <dependency>
-            <groupId>esapiport</groupId>
-            <artifactId>esapiport</artifactId>
-            <version>2013-12</version>
-        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

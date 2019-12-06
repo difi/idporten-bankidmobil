@@ -8,7 +8,7 @@ bankid.servlet.address=https://<%= @bankid_servlet_hostname %>/idporten-bankid-m
 bankid.response.servlet.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/bidresponse
 bankid.response.url=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/authorizationCode
 bankid.event.emitter=https://<%= @bankid_webaddress_hostname %>/idporten-bankid-mobil/eventEmitter
-bankid.serverid=<% if !(@serverid.empty?) %>/<%= @serverid %>/<% end %>
+bankid.serverid=<% if !(@serverid.empty?) %><%= @serverid %><% end %>
 bankid.action=<%= @bankid_action %>
 bankid.clienttype=<%= @bankid_clienttype %>
 bankid.keystorefile=<%= @bankid_keystore_file %>
