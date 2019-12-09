@@ -30,7 +30,7 @@ public class BankIDMobilResponseServlet extends HttpServlet {
     private static final String FORCE_AUTH_PARAMETER_NAME = "ForceAuth";
     private static final String CHARSET_PARAMETER_NAME = "gx_charset";
     private static final String LOCALE_PARAMETER_NAME = "locale";
-    private static final String SERVER_ID_PARAMETER_NAME = "serverId";
+    private static final String SERVER_ID_PARAMETER_NAME = "serverid";
     private static final String SID_PARAMETER_NAME = "code";
     private static final String BANKID_RESPONSE_SERVICE = "BankIDMobilEkstern";
 
