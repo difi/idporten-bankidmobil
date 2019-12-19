@@ -1,6 +1,7 @@
 package no.idporten.bankid;
 
 import no.idporten.bankid.config.CacheConfiguration;
+import no.idporten.bankid.util.BankIDProperties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,6 +46,9 @@ public class BankIDMobilResponseServletTest {
     @Autowired
     BankIDCache bankIDCache;
 
+    @Autowired
+    BankIDProperties bankIDProperties;
+
 
     @Before
     public void setUp() throws IOException {
@@ -59,7 +63,7 @@ public class BankIDMobilResponseServletTest {
         when(mockedSession.getAttribute("service")).thenReturn("BIDEksternResponse");
 
         when(mockedResponse.getWriter()).thenReturn(mockedWriter);
-        rs = new BankIDMobilResponseServlet(bankIDCache);
+        rs = new BankIDMobilResponseServlet(bankIDCache,bankIDProperties );
 
     }
 

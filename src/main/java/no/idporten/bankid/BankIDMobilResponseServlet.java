@@ -35,11 +35,12 @@ public class BankIDMobilResponseServlet extends HttpServlet {
     private static final String BANKID_RESPONSE_SERVICE = "BankIDMobilEkstern";
 
     private BankIDCache bankIDCache;
-
+    private BankIDProperties bankIDProperties;
     private final Logger log = LoggerFactory.getLogger(BankIDMobilResponseServlet.class);
 
-    BankIDMobilResponseServlet(BankIDCache bankIDCache) {
+    BankIDMobilResponseServlet(BankIDCache bankIDCache, BankIDProperties bankIDProperties) {
         this.bankIDCache = bankIDCache;
+        this.bankIDProperties = bankIDProperties;
     }
 
     @RequestMapping(method = {RequestMethod.GET, RequestMethod.POST}, value = "/bidresponse")
@@ -83,7 +84,7 @@ public class BankIDMobilResponseServlet extends HttpServlet {
                        .queryParam(LOCALE_PARAMETER_NAME, request.getSession().getAttribute("locale"))
                        .queryParam(GOTO_PARAMETER_NAME, request.getSession().getAttribute("goto"))
                        .queryParam(SERVICE_PARAMETER_NAME, service)
-                       .queryParam(SERVER_ID_PARAMETER_NAME, request.getSession().getAttribute("serverId"))
+                       .queryParam(SERVER_ID_PARAMETER_NAME, bankIDProperties.getBankIdServerId())
                        .build()
                        .toUriString();
         } catch (URISyntaxException e) {
