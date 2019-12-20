@@ -143,7 +143,7 @@ public class BankIDMobilServlet {
         SseEmitter emitter = bankIDCache.getEmitter(sid);
         if (emitter == null) {
             log.warn("lager ny emitter");
-            emitter = new SseEmitter(15000L);
+            emitter = new SseEmitter(60000L);
             bankIDCache.putEmitter(sid, emitter);
             emitter.onTimeout(() -> {
                 bankIDCache.removeEmitter(sid);

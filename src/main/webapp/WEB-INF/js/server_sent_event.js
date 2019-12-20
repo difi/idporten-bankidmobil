@@ -5,6 +5,7 @@ function setUpEmitter(sessionId) {
     });
     source.onerror = function(e) {
         sjekkLagretStatus();
+        setUpEmitter(sessionId);
     };
 }
 
