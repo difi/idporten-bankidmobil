@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.1.RELEASE</version>
+        <version>2.2.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>no.idporten</groupId>
@@ -25,6 +25,8 @@
         <commons.lang.version>2.6</commons.lang.version>
         <logstash.logback.version>5.2</logstash.logback.version>
         <bouncycastle.version>1.60</bouncycastle.version>
+        <apache.commons-validator.version>1.6</apache.commons-validator.version>
+        <apache.commons-beanutils.version>1.9.4</apache.commons-beanutils.version>
     </properties>
 
     <dependencies>
@@ -89,6 +91,16 @@
         <dependency>
             <groupId>org.apache.tomcat.embed</groupId>
             <artifactId>tomcat-embed-jasper</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>${apache.commons-validator.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-beanutils</groupId>
+            <artifactId>commons-beanutils</artifactId>
+            <version>${apache.commons-beanutils.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.servlet</groupId>

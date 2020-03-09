@@ -28,7 +28,8 @@ class idporten_bankidmobil (
   $install_dir                                   =$idporten_bankidmobil::params::install_dir,
   $server_port                                   =$idporten_bankidmobil::params::server_port,
   $idporten_redirect_url                         =$idporten_bankidmobil::params::idporten_redirect_url,
-  $java_home                                     =$idporten_bankidmobil::params::java_home
+  $java_home                                     =$idporten_bankidmobil::params::java_home,
+  $tomcat_tmp_dir                                =$idporten_bankidmobil::params::tomcat_tmp_dir
 ) inherits idporten_bankidmobil::params {
 
   include platform
