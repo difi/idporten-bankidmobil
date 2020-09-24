@@ -17,24 +17,14 @@ bankid.merchant.name=<%= @bankid_merchant_name %>
 bankid.webaddress.hostname=<%= @bankid_servlet_hostname %>
 bankid.webaddress.ip=<%= @bankid_webaddress_ip %>
 bankid.grantedpolicies=<%= @bankid_grantedpolicies %>
-bankid.timeout=
-bankid.reset=
 bankid.logging.enabled=<%= @bankid_logging_enabled %>
 bankid.logging.propfile=<%= @bankid_logging_prop_file %>
 bankid.logging.categoryname=<%= @bankid_logging_category_name %>
 bankid.cors.allow_origin=<%= @bankid_cors_allow_origin %>
 bankid.suppress_broadcast=<%= @bankid_suppress_broadcast %>
-
 idporten.redirecturl=https://<%= @bankid_webaddress_hostname %>/UI/Login?realm=norge.no
-
-management.endpoints.web.cors.allowed-origins=http://localhost:8080
-management.endpoints.web.cors.allowed-methods=GET,POST,HEAD
-management.health.diskspace.enabled=false
-
 spring.security.user.name=<%= @bankidmobil_basic_username %>
 spring.security.user.password=<%= @bankidmobil_basic_password %>
-
 spring.mvc.async.request-timeout=180000
 eventsource.enabled=<%= @eventsource_enabled %>
-
 server.tomcat.basedir=<%= @tomcat_tmp_dir %>
