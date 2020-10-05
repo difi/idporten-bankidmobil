@@ -142,7 +142,7 @@ public class BankIDMobilServlet {
         log.debug("kaller mobilstatusEmitter " + sid);
         SseEmitter emitter = bankIDCache.getEmitter(sid);
         if (emitter == null) {
-            log.warn("lager ny emitter");
+            log.debug("lager ny emitter");
             emitter = new SseEmitter(60000L);
             bankIDCache.putEmitter(sid, emitter);
             emitter.onTimeout(() -> {
@@ -174,7 +174,7 @@ public class BankIDMobilServlet {
 
     /**
      * Handles BIDExceptions and generates error response to BankID client.
-     * 
+     *
      * @param operation operation (used for logging)
      * @param sessionData session data
      * @param exception the API exception
