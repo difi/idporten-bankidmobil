@@ -49,7 +49,7 @@ public class BankIDMobilResponseServlet extends HttpServlet {
                            HttpServletResponse response) throws IOException {
         String sid = (String) request.getSession().getAttribute("sid");
         log.debug("/bidresponse status: " + request.getSession().getAttribute(BankIDProperties.HTTP_SESSION_STATE)
-                + " idperror " + idpError + " status: " + bankIDCache.getMobileStatus(sid) + " sid: " + sid);
+                + " idperror " + idpError + " status: " + bankIDCache.getMobileStatus(sid));
         String code = (BankIDMobileStatus.FINISHED == bankIDCache.getMobileStatus(sid)) ? sid : "";
         String service;
         if (idpError == null) {

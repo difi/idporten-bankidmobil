@@ -54,6 +54,8 @@ public class BankIDMobilAuthorizeController {
     private final String BIRTHDATE = "birthDate";
     private final String IDPORTEN_INPUTBUTTON_PREFIX = "idporten.inputbutton.";
 
+    private MobileInfo mobileInfo;
+
     private final BankIDProperties bankIdProperties;
     private final BankIDFacadeWrapper bankIdFacadeWrapper;
     private final LocaleResolver localeResolver;
@@ -86,6 +88,7 @@ public class BankIDMobilAuthorizeController {
         request.getSession().setAttribute("eventsourceEnabled", eventSourceEnabled);
         localeResolver.setLocale(request, response, new Locale(request.getParameter("locale")));
         setSessionState(request, STATE_USERDATA);
+        initMobileInfo(sid);
 
         return new ModelAndView("bankidmobil_enter_userdata");
     }
@@ -142,7 +145,7 @@ public class BankIDMobilAuthorizeController {
      * can be gotten from config/session.
      * @param sid unique identifier for session
      */
-    private MobileInfo initMobileInfo(String sid, String phoneNumber, String phoneAlias) {
+    private void initMobileInfo(String sid) {
         final MobileInfo mobileInfo = new MobileInfo();
         mobileInfo.setCountryCode("47");
         mobileInfo.setDoSynchronusCommunication(false);
@@ -151,9 +154,7 @@ public class BankIDMobilAuthorizeController {
         mobileInfo.setAction("auth");
         mobileInfo.setSid(sid);
         mobileInfo.setUrl(bankIdProperties.getBankIdServletAddress());
-        mobileInfo.setPhoneNumber(phoneNumber);
-        mobileInfo.setPhoneAlias(phoneAlias);
-        return mobileInfo;
+        this.mobileInfo = mobileInfo;
     }
 
     /**
@@ -179,10 +180,9 @@ public class BankIDMobilAuthorizeController {
             request.setAttribute("eventEmitterUrl", bankIdProperties.getBankIdEventEmitter());
             return STATE_USERDATA;
         }
-        String sid = (String) request.getSession().getAttribute("sid");
-        MobileInfo mobileInfo = initMobileInfo(sid, inputMobileNumber, inputBirthDate);
-
-        return prepareMobileTransaction(request, mobileInfo);
+        getMobileInfo().setPhoneNumber(inputMobileNumber);
+        getMobileInfo().setPhoneAlias(inputBirthDate);
+        return prepareMobileTransaction(request);
     }
 
     /**
@@ -194,19 +194,18 @@ public class BankIDMobilAuthorizeController {
      * @return
      * @throws LoginException
      */
-    private int prepareMobileTransaction(HttpServletRequest request, MobileInfo mobileInfo) {
+    private int prepareMobileTransaction(HttpServletRequest request) {
         try {
-            log.debug("prepareMobileTransaction - mobileinfo: " + getMobileInfoAsString(mobileInfo));
             final String merchantReference = bankIdFacadeWrapper.getFacade().generateMerchantReference("no_NO");
             log.debug("merchant reference: " + merchantReference);
-            mobileInfo.setMerchantReference(merchantReference);
-            final TransactionAndStatus mobileSession = bankIdFacadeWrapper.getFacade().requestMobileAction(mobileInfo);
+            getMobileInfo().setMerchantReference(merchantReference);
+            final TransactionAndStatus mobileSession = bankIdFacadeWrapper.getFacade().requestMobileAction(getMobileInfo());
             log.debug("Request mobile session: " + merchantReference + " statuskode: " + mobileSession.getStatusCode());
             mobileSession.setTransactionReference(merchantReference);
             if ("0".equalsIgnoreCase(mobileSession.getStatusCode())) {
                 bankIDCache.putMobileStatus((String) request.getSession().getAttribute("sid"), BankIDMobileStatus.WAIT);
                 request.setAttribute("code", merchantReference);
-                log.debug("mobileInfo: " + getMobileInfoAsString(mobileInfo));
+                log.debug("mobileInfo: " + getMobileInfoAsString(getMobileInfo()));
                 return STATE_VERIFICATION_CODE;
             } else {
                 log.error("Failed to generate merchant reference and request mobile action " + toStringMobileSession(mobileSession));
@@ -238,17 +237,16 @@ public class BankIDMobilAuthorizeController {
         if (isButtonPushed(request, IDPortenButtonType.CANCEL)) {
             throw new BankIDMobileCancelException();
         }
-        String sid = (String) request.getSession().getAttribute("sid");
-        BankIDMobileStatus mobileStatus = bankIDCache.getMobileStatus(sid);
-        log.debug("handlePollingFinished: " + request.getSession().getAttribute("sid"));
+        String sessionId = request.getSession().getId();
+        BankIDMobileStatus mobileStatus = bankIDCache.getMobileStatus(sessionId);
         if (BankIDMobileStatus.FINISHED == mobileStatus) {
-            log.debug("STATE_AUTHENTICATED " + sid);
+            log.debug("STATE_AUTHENTICATED " + sessionId);
             return STATE_AUTHENTICATED;
         } else if (mobileStatus == null || mobileStatus == BankIDMobileStatus.ERROR) {
-            log.debug("Error in mobilestatus " + sid + " - " + mobileStatus);
+            log.debug("Error in mobilestatus " + sessionId + " - " + mobileStatus);
             return prepareErrorPage(null, request);
         } else if (BankIDMobileStatus.WAIT == mobileStatus) {
-            log.debug("Still waiting: " + sid);
+            log.debug("Still waiting: " + sessionId);
             return STATE_VERIFICATION_CODE;
         }
         log.debug("Shouldn't come here " + mobileStatus);
