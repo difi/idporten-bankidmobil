@@ -1,6 +1,8 @@
 package no.idporten.bankid;
 
 import no.bbs.server.implementation.BIDFacade;
+import no.bbs.server.vos.BIDSessionData;
+import no.bbs.server.vos.CertificateStatus;
 import no.bbs.server.vos.MobileInfo;
 import no.bbs.server.vos.TransactionAndStatus;
 import no.idporten.bankid.config.CacheConfiguration;
@@ -24,9 +26,12 @@ import org.springframework.web.context.WebApplicationContext;
 
 import static no.idporten.bankid.BankIDMobilAuthorizeController.IDPORTEN_INPUT_PREFIX;
 import static no.idporten.bankid.BankIDMobilAuthorizeController.STATE_USERDATA;
+import static no.idporten.bankid.BankIDMobilAuthorizeControllerTest.performAuthorizeGet;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -36,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @RunWith(SpringRunner.class)
 @TestPropertySource(properties = {"spring.cache.type=jcache"})
 @ContextConfiguration(classes = {BankIDMobilApplication.class, CacheConfiguration.class})
-public class BankIDMobilAuthorizeControllerTest {
+public class BankIDMobileFlowTest {
 
     private MockMvc mockMvc;
 
@@ -60,42 +65,65 @@ public class BankIDMobilAuthorizeControllerTest {
     }
 
     @Test
-    public void startAuthorizeShouldThenDisplayEnterUserdataPage() throws Exception {
-        final String redirectUrl = "http://redirect.url";
-        performAuthorizeGet(mockMvc, redirectUrl);
-    }
+    public void testCompleteAutenticationShouldReturnHTMLWithRedirectAction() throws Exception {
 
-    protected static MvcResult performAuthorizeGet(MockMvc mockMvc, String redirectUrl) throws Exception {
-        return mockMvc.perform(
-                get("/authorize")
-                        .param("redirectUrl", redirectUrl)
-                        .param("service", "service")
-                        .param("gx_charset", "gx_charset")
-                        .param("locale", "nb")
-                        .param("start-service", "start-service"))
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(view().name("bankidmobil_enter_userdata"))
-                .andReturn();
-    }
-
-    @Test
-    public void startAuthorizeAndInputMobileInfoShouldThenDisplayShowReferencePage() throws Exception {
         final String redirectUrl = "http://redirect.url";
-        //perform GET
+        // Perform Authorize GET
         final MvcResult mvcResult1 = performAuthorizeGet(mockMvc, redirectUrl);
-
         MockHttpSession session1 = (MockHttpSession) mvcResult1.getRequest().getSession();
+        final String sid = (String) session1.getAttribute("sid");
         String codeWords = "ADJEKTIV SUBSTANTIV";
 
-        //perform POST
-        final MvcResult mvcResult2 = mockAndPerformAuthorizePost(session1, codeWords);
-        // verify
+        // Perform Authorize POST
+        final MvcResult mvcResult2 = mockAndPerformAuthorizePost(session1, codeWords, "99999999");
         final String codeWordsPresented = (String) mvcResult2.getRequest().getAttribute("code");
         assertEquals(codeWords, codeWordsPresented);
+        MockHttpSession session2 = (MockHttpSession) mvcResult2.getRequest().getSession();
+
+        when(bankIDCache.getTraceId(sid)).thenReturn(sid);
+        final BIDSessionData bidSessionData = new BIDSessionData();
+        bidSessionData.setCertificateStatus(new CertificateStatus());
+        when(bankIDCache.getBIDSessionData(sid)).thenReturn(bidSessionData);
+        // BankID has recived our request to start authorize (they will start this request)
+        mockMvc.perform(
+                post("/bankid")
+                        .session(session2)
+                        .param("operation", "initAuth")
+                        .param("sid", sid)
+                        .param("encKey", "encKey")
+                        .param("encData", "encData")
+                        .param("encAuth", "encAuth"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        // Users confirms on mobile phone...
+        // BankID confirms user has finished authorization with bankid
+        mockMvc.perform(
+                post("/bankid")
+                        .session(session2)
+                        .param("operation", "verifyAuth")
+                        .param("sid", sid)
+                        .param("encKey", "encKey")
+                        .param("encData", "encData")
+                        .param("encAuth", "encAuth"))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+
+        when(bankIDCache.getMobileStatus(anyString())).thenReturn(BankIDMobileStatus.FINISHED);
+
+        final MvcResult mvcResult3 = mockMvc.perform(
+                post("/bidresponse")
+                        .session(session2))
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andReturn();
+        final String content = mvcResult3.getResponse().getContentAsString();
+
+        assertTrue(content.contains("action=\"" + redirectUrl + "?code=" + sid));
     }
 
-    private MvcResult mockAndPerformAuthorizePost(MockHttpSession session, String codeWords) throws Exception {
+
+    private MvcResult mockAndPerformAuthorizePost(MockHttpSession session, String codeWords, String phoneNumber) throws Exception {
         final TransactionAndStatus t = new TransactionAndStatus();
         t.setStatusCode("0");
         when(facade.requestMobileAction(any(MobileInfo.class))).thenReturn(t);
@@ -104,7 +132,7 @@ public class BankIDMobilAuthorizeControllerTest {
         final MvcResult mvcResult = mockMvc.perform(
                 post("/authorize")
                         .sessionAttr(BankIDProperties.HTTP_SESSION_STATE, STATE_USERDATA)
-                        .param(IDPORTEN_INPUT_PREFIX + IDPortenInputType.CONTACTINFO_MOBILE, "99999999")
+                        .param(IDPORTEN_INPUT_PREFIX + IDPortenInputType.CONTACTINFO_MOBILE, phoneNumber)
                         .param(IDPORTEN_INPUT_PREFIX + IDPortenInputType.BIRTHDATE, "111279")
                         .session(session))
                 .andDo(print())

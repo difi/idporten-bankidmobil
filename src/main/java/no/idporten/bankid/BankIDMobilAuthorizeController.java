@@ -48,11 +48,11 @@ public class BankIDMobilAuthorizeController {
     protected static final int STATE_ERROR = 3;
 
     private static final String SERVICE_PARAMETER_NAME = "service";
-    private final String IDPORTEN_INPUT_PREFIX = "idporten.input.";
-    private final String IDPORTEN_FEEDBACK_PREFIX = "idporten.feedback.";
-    private final String MOBILE_NUMBER = "mobileNumber";
-    private final String BIRTHDATE = "birthDate";
-    private final String IDPORTEN_INPUTBUTTON_PREFIX = "idporten.inputbutton.";
+    protected static final String IDPORTEN_INPUT_PREFIX = "idporten.input.";
+    private static final String IDPORTEN_FEEDBACK_PREFIX = "idporten.feedback.";
+    private static final String MOBILE_NUMBER = "mobileNumber";
+    private static final String BIRTHDATE = "birthDate";
+    private static final String IDPORTEN_INPUTBUTTON_PREFIX = "idporten.inputbutton.";
 
     private final BankIDProperties bankIdProperties;
     private final BankIDFacadeWrapper bankIdFacadeWrapper;
